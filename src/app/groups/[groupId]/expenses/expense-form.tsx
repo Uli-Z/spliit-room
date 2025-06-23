@@ -62,6 +62,7 @@ import {
   formatCurrency,
   getCurrencyFromGroup,
 } from '@/lib/utils'
+import { trpc } from '@/trpc/client'
 import { AppRouterOutput } from '@/trpc/routers/_app'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ChevronRight, Save } from 'lucide-react'
@@ -106,66 +107,41 @@ const getDefaultSplittingOptions = (
     })),
   }
 
-  if (typeof localStorage === 'undefined') return defaultValue
-  const defaultSplitMode = localStorage.getItem(
-    `${group.id}-defaultSplittingOptions`,
-  )
-  if (defaultSplitMode === null) return defaultValue
-  const parsedDefaultSplitMode = JSON.parse(
-    defaultSplitMode,
-  ) as SplittingOptions
-
-  if (parsedDefaultSplitMode.paidFor === null) {
-    parsedDefaultSplitMode.paidFor = defaultValue.paidFor
-  }
-
-  // if there is a participant in the default options that does not exist anymore,
-  // remove the stale default splitting options
-  for (const parsedPaidFor of parsedDefaultSplitMode.paidFor) {
-    if (
-      !group.participants.some(({ id }) => id === parsedPaidFor.participant)
-    ) {
-      localStorage.removeItem(`${group.id}-defaultSplittingOptions`)
-      return defaultValue
+  // Keep an existing browser-local default until the group has a server default.
+  // We do not automatically publish it: members may have different local defaults.
+  let options = group.defaultSplittingOptions as SplittingOptions | null
+  if (!options && typeof localStorage !== 'undefined') {
+    try {
+      const saved = localStorage.getItem(`${group.id}-defaultSplittingOptions`)
+      if (saved) options = JSON.parse(saved) as SplittingOptions
+    } catch {
+      // Invalid legacy data must not prevent an expense form from opening.
     }
+  }
+  if (!options || !Object.values(SplitMode).includes(options.splitMode)) {
+    return defaultValue
+  }
+  if (options.paidFor === null) {
+    return { splitMode: options.splitMode, paidFor: defaultValue.paidFor }
+  }
+  if (
+    !Array.isArray(options.paidFor) ||
+    options.paidFor.some(
+      ({ participant, shares }) =>
+        !group.participants.some(({ id }) => id === participant) ||
+        typeof shares !== 'number' ||
+        !Number.isFinite(shares),
+    )
+  ) {
+    return defaultValue
   }
 
   return {
-    splitMode: parsedDefaultSplitMode.splitMode,
-    paidFor: parsedDefaultSplitMode.paidFor.map((paidFor) => ({
-      participant: paidFor.participant,
-      shares: (paidFor.shares / 100).toString(), // Convert to string for consistent schema handling
+    splitMode: options.splitMode,
+    paidFor: options.paidFor.map(({ participant, shares }) => ({
+      participant,
+      shares: String(shares / 100),
     })),
-  }
-}
-
-async function persistDefaultSplittingOptions(
-  groupId: string,
-  expenseFormValues: ExpenseFormValues,
-) {
-  if (localStorage && expenseFormValues.saveDefaultSplittingOptions) {
-    const computePaidFor = (): SplittingOptions['paidFor'] => {
-      if (expenseFormValues.splitMode === 'EVENLY') {
-        return expenseFormValues.paidFor.map(({ participant }) => ({
-          participant,
-          shares: 100,
-        }))
-      } else if (expenseFormValues.splitMode === 'BY_AMOUNT') {
-        return null
-      } else {
-        return expenseFormValues.paidFor
-      }
-    }
-
-    const splittingOptions = {
-      splitMode: expenseFormValues.splitMode,
-      paidFor: computePaidFor(),
-    } satisfies SplittingOptions
-
-    localStorage.setItem(
-      `${groupId}-defaultSplittingOptions`,
-      JSON.stringify(splittingOptions),
-    )
   }
 }
 
@@ -313,16 +289,40 @@ export function ExpenseForm({
   })
   const [isCategoryLoading, setCategoryLoading] = useState(false)
   const activeUserId = useActiveUser(group.id)
+  const { mutateAsync: updateDefaultSplittingOptions } =
+    trpc.groups.updateDefaultSplittingOptions.useMutation()
+  const utils = trpc.useUtils()
+
   const sendEvent = useAnalytics()
-
   const submit = async (values: ExpenseFormValues) => {
-    sendEvent(
-      { event: expense ? 'expense: update' : 'expense: create', props: {} },
-      `/groups/${group.id}/expenses`,
-    )
+    sendEvent({ event: expense ? 'expense: update' : 'expense: create', props: {} }, `/groups/${group.id}/expenses`)
+    if (values.saveDefaultSplittingOptions) {
+      const computePaidFor = (): SplittingOptions['paidFor'] => {
+        if (values.splitMode === 'EVENLY') {
+          return values.paidFor.map(({ participant }) => ({
+            participant,
+            shares: 100,
+          }))
+        } else if (values.splitMode === 'BY_AMOUNT') {
+          return null
+        }
+        return values.paidFor.map(({ participant, shares }) => ({
+          participant,
+          shares: Number(shares),
+        }))
+      }
 
-    await persistDefaultSplittingOptions(group.id, values)
+      const splittingOptions = {
+        splitMode: values.splitMode,
+        paidFor: computePaidFor(),
+      } satisfies SplittingOptions
 
+      await updateDefaultSplittingOptions({
+        groupId: group.id,
+        defaultSplittingOptions: splittingOptions,
+      })
+      await utils.groups.invalidate()
+    }
     // Store monetary amounts in minor units (cents)
     values.amount = amountAsMinorUnits(values.amount, groupCurrency)
     values.paidFor = values.paidFor.map(({ participant, shares }) => ({
