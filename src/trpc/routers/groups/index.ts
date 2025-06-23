@@ -17,6 +17,7 @@ import {
 } from './import'
 import { listGroupsProcedure } from './list.procedure'
 import { listAllGroupsProcedure } from './listAll.procedure'
+import { updateDefaultSplittingOptionsProcedure } from './updateDefaultSplittingOptions.procedure'
 
 export const groupsRouter = createTRPCRouter({
   expenses: groupExpensesRouter,
@@ -36,4 +37,5 @@ export const groupsRouter = createTRPCRouter({
   importFromFileCancelJob: cancelCreateImportFromFileProcedure,
   importFromFileFinalize: finalizeCreateImportFromFileProcedure,
   update: updateGroupProcedure,
+  updateDefaultSplittingOptions: updateDefaultSplittingOptionsProcedure,
 })
