@@ -12,7 +12,17 @@
   },
   "Footer": {
     "madeIn": "Made in Montréal, Québec 🇨🇦",
-    "builtBy": "Built by <author>Sebastien Castiel</author> and <source>contributors</source>"
+    "builtBy": "Built by <author>Sebastien Castiel</author> and <source>contributors</source>",
+    "originalRepo": "GitHub (Spliit)",
+    "forkRepo": "GitHub (Spliit-Room)",
+    "forkNotice": "Spliit-Room, a fork of <upstream>Spliit</upstream>"
+  },
+  "Login": {
+    "description": "Access restricted - please enter the password",
+    "password": "Password",
+    "enter": "Enter",
+    "wrongPassword": "Wrong password",
+    "tooManyAttempts": "Too many login attempts. Please try again later."
   },
   "Expenses": {
     "title": "Expenses",
