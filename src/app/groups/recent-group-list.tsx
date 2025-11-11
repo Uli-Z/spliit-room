@@ -14,6 +14,7 @@ import { Loader2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { PropsWithChildren, useEffect, useState } from 'react'
+import { RuntimeFeatureFlags } from '@/lib/featureFlags'
 import { RecentGroupListCard } from './recent-group-list-card'
 
 export type RecentGroupsState =
@@ -60,11 +61,17 @@ function sortGroups({
   }
 }
 
-export function RecentGroupList() {
+export function RecentGroupList({
+  runtimeFeatureFlags,
+}: {
+  runtimeFeatureFlags: RuntimeFeatureFlags
+}) {
   const [state, setState] = useState<RecentGroupsState>({ status: 'pending' })
 
   function loadGroups() {
-    const groupsInStorage = getRecentGroups()
+    const groupsInStorage = runtimeFeatureFlags.openGroupMode
+      ? []
+      : getRecentGroups()
     const starredGroups = getStarredGroups()
     const archivedGroups = getArchivedGroups()
     setState({
@@ -87,6 +94,7 @@ export function RecentGroupList() {
       starredGroups={state.starredGroups}
       archivedGroups={state.archivedGroups}
       refreshGroupsFromStorage={() => loadGroups()}
+      runtimeFeatureFlags={runtimeFeatureFlags}
     />
   )
 }
@@ -96,20 +104,27 @@ function RecentGroupList_({
   starredGroups,
   archivedGroups,
   refreshGroupsFromStorage,
+  runtimeFeatureFlags,
 }: {
   groups: RecentGroups
   starredGroups: string[]
   archivedGroups: string[]
   refreshGroupsFromStorage: () => void
+  runtimeFeatureFlags: RuntimeFeatureFlags
 }) {
   const t = useTranslations('Groups')
-  const { data, isLoading } = trpc.groups.list.useQuery({
-    groupIds: groups.map((group) => group.id),
-  })
+  const { data, isLoading } = runtimeFeatureFlags.openGroupMode
+    ? trpc.groups.listAll.useQuery()
+    : trpc.groups.list.useQuery({
+        groupIds: groups.map((group) => group.id),
+      })
 
   if (isLoading || !data) {
     return (
-      <GroupsPage reload={refreshGroupsFromStorage}>
+      <GroupsPage
+        reload={refreshGroupsFromStorage}
+        runtimeFeatureFlags={runtimeFeatureFlags}
+      >
         <p>
           <Loader2 className="w-4 m-4 mr-2 inline animate-spin" />{' '}
           {t('loadingRecent')}
@@ -120,7 +135,10 @@ function RecentGroupList_({
 
   if (data.groups.length === 0) {
     return (
-      <GroupsPage reload={refreshGroupsFromStorage}>
+      <GroupsPage
+        reload={refreshGroupsFromStorage}
+        runtimeFeatureFlags={runtimeFeatureFlags}
+      >
         <div className="text-sm space-y-2">
           <p>{t('NoRecent.description')}</p>
           <p>
@@ -134,14 +152,21 @@ function RecentGroupList_({
     )
   }
 
+  const allGroups = runtimeFeatureFlags.openGroupMode
+    ? data.groups.map((g) => ({ id: g.id, name: g.name }))
+    : groups
+
   const { starredGroupInfo, groupInfo, archivedGroupInfo } = sortGroups({
-    groups,
+    groups: allGroups,
     starredGroups,
     archivedGroups,
   })
 
   return (
-    <GroupsPage reload={refreshGroupsFromStorage}>
+    <GroupsPage
+      reload={refreshGroupsFromStorage}
+      runtimeFeatureFlags={runtimeFeatureFlags}
+    >
       {starredGroupInfo.length > 0 && (
         <>
           <h2 className="mb-2">{t('starred')}</h2>
@@ -151,6 +176,7 @@ function RecentGroupList_({
             archivedGroups={archivedGroups}
             starredGroups={starredGroups}
             refreshGroupsFromStorage={refreshGroupsFromStorage}
+            runtimeFeatureFlags={runtimeFeatureFlags}
           />
         </>
       )}
@@ -164,6 +190,7 @@ function RecentGroupList_({
             archivedGroups={archivedGroups}
             starredGroups={starredGroups}
             refreshGroupsFromStorage={refreshGroupsFromStorage}
+            runtimeFeatureFlags={runtimeFeatureFlags}
           />
         </>
       )}
@@ -178,6 +205,7 @@ function RecentGroupList_({
               archivedGroups={archivedGroups}
               starredGroups={starredGroups}
               refreshGroupsFromStorage={refreshGroupsFromStorage}
+              runtimeFeatureFlags={runtimeFeatureFlags}
             />
           </div>
         </>
@@ -192,12 +220,14 @@ function GroupList({
   starredGroups,
   archivedGroups,
   refreshGroupsFromStorage,
+  runtimeFeatureFlags,
 }: {
   groups: RecentGroups
   groupDetails?: AppRouterOutput['groups']['list']['groups']
   starredGroups: string[]
   archivedGroups: string[]
   refreshGroupsFromStorage: () => void
+  runtimeFeatureFlags: RuntimeFeatureFlags
 }) {
   return (
     <ul className="grid gap-2 sm:grid-cols-2">
@@ -211,6 +241,7 @@ function GroupList({
           isStarred={starredGroups.includes(group.id)}
           isArchived={archivedGroups.includes(group.id)}
           refreshGroupsFromStorage={refreshGroupsFromStorage}
+          runtimeFeatureFlags={runtimeFeatureFlags}
         />
       ))}
     </ul>
@@ -220,16 +251,21 @@ function GroupList({
 function GroupsPage({
   children,
   reload,
-}: PropsWithChildren<{ reload: () => void }>) {
+  runtimeFeatureFlags,
+}: PropsWithChildren<{ reload: () => void; runtimeFeatureFlags: RuntimeFeatureFlags }>) {
   const t = useTranslations('Groups')
   return (
     <>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <h1 className="font-bold text-2xl flex-1">
-          <Link href="/groups">{t('myGroups')}</Link>
+          <Link href="/groups">
+            {t(runtimeFeatureFlags.openGroupMode ? 'allGroups' : 'myGroups')}
+          </Link>
         </h1>
         <div className="flex gap-2">
-          <AddGroupByUrlButton reload={reload} />
+          {!runtimeFeatureFlags.openGroupMode && (
+            <AddGroupByUrlButton reload={reload} />
+          )}
           <Button asChild>
             <Link href="/groups/create">
               {/* <Plus className="w-4 h-4 mr-2" /> */}

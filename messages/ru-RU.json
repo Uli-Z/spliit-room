@@ -76,7 +76,8 @@
     "NotFound": {
       "text": "Этой группы не существует",
       "link": "Перейти к списку недавних групп"
-    }
+    },
+    "allGroups": "All groups"
   },
   "GroupForm": {
     "title": "Сведения о группе",
@@ -137,6 +138,14 @@
       "paidByField": {
         "label": "Получивший",
         "description": "Выберите участника, который получил этот доход."
+      },
+      "recurrenceRule": {
+        "label": "Expense Recurrence",
+        "description": "Select how often the expense should repeat.",
+        "none": "None",
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "monthly": "Monthly"
       },
       "paidFor": {
         "title": "Участники",

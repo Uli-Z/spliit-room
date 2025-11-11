@@ -75,7 +75,8 @@
     "NotFound": {
       "text": "該群組不存在。",
       "link": "前往最近訪問的群組"
-    }
+    },
+    "allGroups": "All groups"
   },
   "GroupForm": {
     "title": "群組資訊",
