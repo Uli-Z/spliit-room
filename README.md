@@ -1,8 +1,34 @@
 [<img alt="Spliit" height="60" src="https://github.com/spliit-app/spliit/blob/main/public/logo-with-text.png?raw=true" />](https://spliit.app)
+ 
+**Fork-specific changes** This version adds a open-group mode, optional password protection, and a customizable header. The features can be enabled via environment variables in your `.env` file:
+
+```bash
+# Show all groups on the landing page
+NEXT_PUBLIC_OPEN_GROUP_MODE=true
+
+# Password protect the instance
+SHARED_PASSWORD="your-password"
+
+# Optional: add a title and second logo in the header
+NEXT_PUBLIC_HEADER_TITLE="My Instance"
+NEXT_PUBLIC_HEADER_LOGO_SECOND="/logo2.png"
+```
+
+## Why this fork?
+Spliit is a great tool — simple, privacy-friendly, and perfect for managing shared expenses without requiring accounts or personal data. It works especially well for spontaneous groups where links are shared casually. However, in fixed communities like shared flats, collectives, or organizations, this model can be inconvenient. Links get lost, duplicate groups pop up, and there's no central overview. Spliit-Room addresses this by making all groups visible to all users within a single, shared space. Access is protected by a common password, preserving Spliit's minimalist spirit while adapting it to the needs of stable, long-term communities.
+
+## Installation
+
+To get started with this fork, which includes fork-specific features and additional bug fixes, clone the repository, specifically the `bundle/fork-release` branch:
+
+```bash
+git clone -b bundle/fork-release https://github.com/Uli-Z/spliit-room.git
+cd spliit-room
+```
 
 Spliit is a free and open source alternative to Splitwise. You can either use the official instance at [Spliit.app](https://spliit.app), or deploy your own instance:
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fspliit-app%2Fspliit&project-name=my-spliit-instance&repository-name=my-spliit-instance&stores=%5B%7B%22type%22%3A%22postgres%22%7D%5D&)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FUli-Z%2Fspliit-room&project-name=my-spliit-room-instance&repository-name=my-spliit-room-instance)
 
 ## Features
 
