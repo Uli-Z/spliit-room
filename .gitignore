@@ -39,3 +39,6 @@ next-env.d.ts
 
 # db
 postgres-data
+public/logo2.jpg
+scripts/start-local-db.sh
+scripts/start-local-db.sh

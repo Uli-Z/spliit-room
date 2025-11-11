@@ -33,6 +33,9 @@ const nextConfig = {
         allowedOrigins: ['localhost:3000'],
     },
 },
+  env: {
+    SHARED_PASSWORD: process.env.SHARED_PASSWORD
+  }
 }
 
 export default withNextIntl(nextConfig)

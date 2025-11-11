@@ -21,6 +21,7 @@ const envSchema = z
       interpretEnvVarAsBool,
       z.boolean().default(false),
     ),
+    NEXT_PUBLIC_DEFAULT_CURRENCY_SYMBOL: z.string().optional(),
     NEXT_PUBLIC_DEFAULT_CURRENCY_CODE: z.string().optional(),
     S3_UPLOAD_KEY: z.string().optional(),
     S3_UPLOAD_SECRET: z.string().optional(),
@@ -36,6 +37,7 @@ const envSchema = z
       z.boolean().default(false),
     ),
     OPENAI_API_KEY: z.string().optional(),
+    SHARED_PASSWORD: z.string().optional(),
   })
   .superRefine((env, ctx) => {
     if (
