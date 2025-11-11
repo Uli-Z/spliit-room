@@ -21,6 +21,10 @@ const envSchema = z
       interpretEnvVarAsBool,
       z.boolean().default(false),
     ),
+    NEXT_PUBLIC_OPEN_GROUP_MODE: z.preprocess(
+      interpretEnvVarAsBool,
+      z.boolean().default(false),
+    ),
     NEXT_PUBLIC_DEFAULT_CURRENCY_SYMBOL: z.string().optional(),
     NEXT_PUBLIC_DEFAULT_CURRENCY_CODE: z.string().optional(),
     NEXT_PUBLIC_HEADER_TITLE: z.string().optional(),

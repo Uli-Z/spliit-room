@@ -78,7 +78,8 @@
     "NotFound": {
       "text": "Deze groep bestaat niet.",
       "link": "Ga naar je recente groepen"
-    }
+    },
+    "allGroups": "All groups"
   },
   "GroupForm": {
     "title": "Groepsinformatie",

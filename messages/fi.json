@@ -75,7 +75,8 @@
     "NotFound": {
       "text": "Tätä ryhmää ei löydy.",
       "link": "Siirry äskettäisiin ryhmiin"
-    }
+    },
+    "allGroups": "All groups"
   },
   "GroupForm": {
     "title": "Ryhmän tiedot",
@@ -136,6 +137,14 @@
       "paidByField": {
         "label": "Vastaanottaja",
         "description": "Valitse kuka vastaanotti tulon."
+      },
+      "recurrenceRule": {
+        "label": "Expense Recurrence",
+        "description": "Select how often the expense should repeat.",
+        "none": "None",
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "monthly": "Monthly"
       },
       "paidFor": {
         "title": "Tulon jakaminen",
