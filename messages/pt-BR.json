@@ -78,7 +78,8 @@
     "NotFound": {
       "text": "Este grupo não existe.",
       "link": "Ir para grupos visitados recentemente"
-    }
+    },
+    "allGroups": "All groups"
   },
   "GroupForm": {
     "title": "Informações do grupo",
