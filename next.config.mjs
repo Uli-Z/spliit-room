@@ -8,6 +8,14 @@ const withNextIntl = createNextIntlPlugin()
  */
 const remotePatterns = []
 
+// GitHub-Icons
+remotePatterns.push({
+  protocol: 'https',
+  hostname: 'github.githubassets.com',
+  port: '',
+  pathname: '/images/modules/logos_page/**',
+})
+
 // S3 Storage
 if (process.env.S3_UPLOAD_ENDPOINT) {
   // custom endpoint for providers other than AWS
