@@ -131,3 +131,11 @@ enum ActivityType {
   UPDATE_EXPENSE
   DELETE_EXPENSE
 }
+
+// Track failed login attempts per IP for lockout
+model LoginAttempt {
+  ip           String   @id
+  count        Int
+  lastAttempt  DateTime
+  lockoutUntil DateTime
+}
