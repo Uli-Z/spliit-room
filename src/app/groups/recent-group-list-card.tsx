@@ -28,12 +28,14 @@ export function RecentGroupListCard({
   isStarred,
   isArchived,
   refreshGroupsFromStorage,
+  runtimeFeatureFlags,
 }: {
   group: RecentGroup
   groupDetail?: AppRouterOutput['groups']['list']['groups'][number]
   isStarred: boolean
   isArchived: boolean
   refreshGroupsFromStorage: () => void
+  runtimeFeatureFlags: import('@/lib/featureFlags').RuntimeFeatureFlags
 }) {
   const router = useRouter()
   const locale = useLocale()
@@ -92,21 +94,23 @@ export function RecentGroupListCard({
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem
-                      className="text-destructive"
-                      onClick={(event) => {
-                        event.stopPropagation()
-                        deleteRecentGroup(group)
-                        refreshGroupsFromStorage()
+                    {!runtimeFeatureFlags.openGroupMode && (
+                      <DropdownMenuItem
+                        className="text-destructive"
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          deleteRecentGroup(group)
+                          refreshGroupsFromStorage()
 
-                        toast.toast({
-                          title: t('RecentRemovedToast.title'),
-                          description: t('RecentRemovedToast.description'),
-                        })
-                      }}
-                    >
-                      {t('removeRecent')}
-                    </DropdownMenuItem>
+                          toast.toast({
+                            title: t('RecentRemovedToast.title'),
+                            description: t('RecentRemovedToast.description'),
+                          })
+                        }}
+                      >
+                        {t('removeRecent')}
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem
                       onClick={(event) => {
                         event.stopPropagation()

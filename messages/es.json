@@ -78,7 +78,8 @@
     "NotFound": {
       "text": "Este grupo no existe.",
       "link": "Ir a los grupos visitados recientemente"
-    }
+    },
+    "allGroups": "Todos los grupos"
   },
   "GroupForm": {
     "title": "Información del grupo",
@@ -145,6 +146,14 @@
       "paidByField": {
         "label": "Recibido por",
         "description": "Seleccione el participante que recibió los ingresos."
+      },
+      "recurrenceRule": {
+        "label": "Recurrencia del gasto",
+        "description": "Seleccione con qué frecuencia debe repetirse el gasto.",
+        "none": "Ninguno",
+        "daily": "Diario",
+        "weekly": "Semanal",
+        "monthly": "Mensual"
       },
       "paidFor": {
         "title": "Recibido para for",
