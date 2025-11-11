@@ -23,6 +23,8 @@ const envSchema = z
     ),
     NEXT_PUBLIC_DEFAULT_CURRENCY_SYMBOL: z.string().optional(),
     NEXT_PUBLIC_DEFAULT_CURRENCY_CODE: z.string().optional(),
+    NEXT_PUBLIC_HEADER_TITLE: z.string().optional(),
+    NEXT_PUBLIC_HEADER_LOGO_SECOND: z.string().optional(),
     S3_UPLOAD_KEY: z.string().optional(),
     S3_UPLOAD_SECRET: z.string().optional(),
     S3_UPLOAD_BUCKET: z.string().optional(),

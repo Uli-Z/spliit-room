@@ -65,24 +65,49 @@ export const viewport: Viewport = {
 
 function Content({ children }: { children: React.ReactNode }) {
   const t = useTranslations()
+  const { NEXT_PUBLIC_HEADER_TITLE, NEXT_PUBLIC_HEADER_LOGO_SECOND } = env
   return (
     <TRPCProvider>
-      <header className="fixed top-0 left-0 right-0 h-16 flex justify-between bg-white dark:bg-gray-950 bg-opacity-50 dark:bg-opacity-50 p-2 border-b backdrop-blur-sm z-50">
+      <header className="fixed top-0 left-0 right-0 h-16 flex justify-between items-center bg-white dark:bg-gray-950 bg-opacity-50 dark:bg-opacity-50 p-2 border-b backdrop-blur-sm z-50">
         <Link
-          className="flex items-center gap-2 hover:scale-105 transition-transform"
           href="/"
+          className="flex items-center gap-3 hover:scale-105 transition-transform"
         >
-          <h1>
+          {/* Primäres Logo, Höhe = Header-Höhe (64px) */}
+          <h1 className="shrink-0">
             <Image
               src="/logo-with-text.png"
-              className="m-1 h-auto w-auto"
+              alt="Spliit"
               width={(35 * 522) / 180}
               height={35}
-              alt="Spliit"
+              style={{ width: 'auto', height: '35px' }}
+              className="object-contain"
+              priority
             />
           </h1>
+
+          {/* Sekundäres Logo, ebenfalls 64px hoch, Breite auto */}
+          {NEXT_PUBLIC_HEADER_LOGO_SECOND && (
+            <Image
+              src={NEXT_PUBLIC_HEADER_LOGO_SECOND}
+              alt=""
+              width={35}
+              height={35}
+              style={{ width: 'auto', height: '35px' }}
+              className="object-contain"
+              priority
+            />
+          )}
+
+          {/* Titel neben Logos */}
+          {NEXT_PUBLIC_HEADER_TITLE && (
+            <span className="hidden sm:block whitespace-nowrap text-[2.4rem] leading-none font-semibold">
+              {NEXT_PUBLIC_HEADER_TITLE}
+            </span>
+          )}
         </Link>
-        <div role="navigation" aria-label="Menu" className="flex">
+
+        <nav role="navigation" aria-label="Menu" className="flex">
           <ul className="flex items-center text-sm">
             <li>
               <Button
@@ -101,47 +126,87 @@ function Content({ children }: { children: React.ReactNode }) {
               <ThemeToggle />
             </li>
           </ul>
-        </div>
+        </nav>
       </header>
 
       <div className="pt-16 flex-1 flex flex-col">{children}</div>
 
-      <footer className="sm:p-8 md:p-16 sm:mt-16 sm:text-sm md:text-base md:mt-32 bg-slate-50 dark:bg-card border-t p-6 mt-8 flex flex-col sm:flex-row sm:justify-between gap-4 text-xs [&_a]:underline">
-        <div className="flex flex-col space-y-2">
-          <div className="sm:text-lg font-semibold text-base flex space-x-2 items-center">
-            <Link className="flex items-center gap-2" href="/">
+     <footer className="sm:p-8 md:p-16 sm:mt-16 sm:text-sm md:text-base md:mt-32 bg-slate-50 dark:bg-card border-t p-6 mt-8 flex flex-col sm:flex-row sm:justify-between gap-4 text-xs [&_a]:underline">
+      <div className="flex flex-col space-y-2">
+        {/* Hier geändert: keine weiß-Farbe mehr, nur Unterstreichung und Standard-Textfarbe */}
+        <div className="flex flex-col space-y-2 [&_a]:underline [&_a]:text-current">
+          <span>{t('Footer.madeIn')}</span>
+
+          <span>
+            {t.rich('Footer.builtBy', {
+              author: (txt) => (
+                <a href="https://scastiel.dev" target="_blank" rel="noopener">
+                  {txt}
+                </a>
+              ),
+              source: (txt) => (
+                <a
+                  href="https://github.com/Uli-Z/spliit-room/graphs/contributors"
+                  target="_blank"
+                  rel="noopener"
+                  className="inline-flex items-center space-x-1"
+                >
+                  <Image
+                    src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                    alt="GitHub logo"
+                    width={16}
+                    height={16}
+                  />
+                  <span>{txt}</span>
+                </a>
+              ),
+            })}
+          </span>
+
+          <span>
+            {t.rich('Footer.forkNotice', {
+              upstream: (txt) => (
+                <a href="https://spliit.app" target="_blank" rel="noopener">
+                  {txt}
+                </a>
+              ),
+            })}
+          </span>
+
+          <span className="flex items-center space-x-4">
+            <a
+              href="https://github.com/spliit-app/spliit"
+              target="_blank"
+              rel="noopener"
+              className="inline-flex items-center space-x-1"
+            >
               <Image
-                src="/logo-with-text.png"
-                className="m-1 h-auto w-auto"
-                width={(35 * 522) / 180}
-                height={35}
-                alt="Spliit"
+                src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                alt="GitHub logo"
+                width={16}
+                height={16}
               />
-            </Link>
-          </div>
-          <div className="flex flex-col space-y a--no-underline-text-white">
-            <span>{t('Footer.madeIn')}</span>
-            <span>
-              {t.rich('Footer.builtBy', {
-                author: (txt) => (
-                  <a href="https://scastiel.dev" target="_blank" rel="noopener">
-                    {txt}
-                  </a>
-                ),
-                source: (txt) => (
-                  <a
-                    href="https://github.com/spliit-app/spliit/graphs/contributors"
-                    target="_blank"
-                    rel="noopener"
-                  >
-                    {txt}
-                  </a>
-                ),
-              })}
-            </span>
-          </div>
+              <span>{t('Footer.originalRepo')}</span>
+            </a>
+
+            <a
+              href="https://github.com/Uli-Z/spliit-room"
+              target="_blank"
+              rel="noopener"
+              className="inline-flex items-center space-x-1"
+            >
+              <Image
+                src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                alt="GitHub logo"
+                width={16}
+                height={16}
+              />
+              <span>{t('Footer.forkRepo')}</span>
+            </a>
+          </span>
         </div>
-      </footer>
+      </div>
+    </footer>
       <Toaster />
     </TRPCProvider>
   )
