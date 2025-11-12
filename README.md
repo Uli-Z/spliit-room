@@ -26,6 +26,11 @@ git clone -b bundle/fork-release https://github.com/Uli-Z/spliit-room.git
 cd spliit-room
 ```
 
+## Try the Fork Online
+
+You can try out this fork live at: [https://spliit-omega.vercel.app](https://spliit-omega.vercel.app)
+The password to access the instance is: `test123`
+
 Spliit is a free and open source alternative to Splitwise. You can either use the official instance at [Spliit.app](https://spliit.app), or deploy your own instance:
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FUli-Z%2Fspliit-room&project-name=my-spliit-room-instance&repository-name=my-spliit-room-instance)
