@@ -66,10 +66,12 @@ export const viewport: Viewport = {
 function Content({ children }: { children: React.ReactNode }) {
   const t = useTranslations()
   const { NEXT_PUBLIC_HEADER_TITLE, NEXT_PUBLIC_HEADER_LOGO_SECOND } = env
+  const prefetchInternalLinks = !env.SHARED_PASSWORD
   return (
     <TRPCProvider>
       <header className="fixed top-0 left-0 right-0 h-16 flex justify-between items-center bg-white dark:bg-gray-950 bg-opacity-50 dark:bg-opacity-50 p-2 border-b backdrop-blur-sm z-50">
         <Link
+          prefetch={prefetchInternalLinks}
           href="/"
           className="flex items-center gap-3 hover:scale-105 transition-transform"
         >
@@ -116,7 +118,7 @@ function Content({ children }: { children: React.ReactNode }) {
                 asChild
                 className="-my-3 text-primary"
               >
-                <Link href="/groups">{t('Header.groups')}</Link>
+                <Link prefetch={prefetchInternalLinks} href="/groups">{t('Header.groups')}</Link>
               </Button>
             </li>
             <li>

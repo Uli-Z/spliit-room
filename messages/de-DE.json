@@ -18,12 +18,13 @@
     "forkNotice": "Spliit-Room, a fork of <upstream>Spliit</upstream>"
   },
   "Login": {
-    "description": "Zugang eingeschränkt - bitte gebe das Passwort an",
-    "password": "Passwort",
-    "enter": "Anmelden",
-    "wrongPassword": "Falsches Passwort",
-    "tooManyAttempts": "Zu viele Anmeldeversuche. Bitte versuchen Sie es später erneut."
-  },
+  "description": "Zugang eingeschränkt - bitte gebe das Passwort an",
+  "password": "Passwort",
+  "enter": "Anmelden",
+  "redirecting": "Leite weiter ...",
+  "wrongPassword": "Falsches Passwort",
+  "tooManyAttempts": "Zu viele Anmeldeversuche. Bitte versuchen Sie es später erneut."
+},
   "Currency": {
     "default": "€"
   },

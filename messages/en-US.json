@@ -18,12 +18,13 @@
     "forkNotice": "Spliit-Room, a fork of <upstream>Spliit</upstream>"
   },
   "Login": {
-    "description": "Access restricted - please enter the password",
-    "password": "Password",
-    "enter": "Enter",
-    "wrongPassword": "Wrong password",
-    "tooManyAttempts": "Too many login attempts. Please try again later."
-  },
+  "description": "Access restricted - please enter the password",
+  "password": "Password",
+  "enter": "Enter",
+  "redirecting": "Redirecting...",
+  "wrongPassword": "Wrong password",
+  "tooManyAttempts": "Too many login attempts. Please try again later."
+},
   "Expenses": {
     "title": "Expenses",
     "description": "Here are the expenses that you created for your group.",
