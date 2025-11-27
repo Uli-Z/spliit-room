@@ -7,7 +7,16 @@ set -euo pipefail
 TRUNK="${TRUNK:-trunk}"                 # mirror of upstream/main
 FORK_MAIN="${FORK_MAIN:-fork/main}"     # your maintained downstream line
 BUNDLE="${BUNDLE:-bundle/fork-release}" # target bundle branch (can contain '/')
-PATTERNS=(${PATTERNS:-"feature/*" "fix/*"})  # local branches to include
+# Curated list of branches to bundle (default: PR branches)
+BUNDLE_BRANCHES=(${BUNDLE_BRANCHES:-\
+"feature/csv-export-saldo-revamp" \
+"feature/generic-import" \
+"fix/refactor-expense-calculation" \
+"bug-fix-export-with-umlauts" \
+"bugfix-incorrect-default-shares-evenly-mode" \
+"bug-mark-as-paid" \
+"serverside-default-split-options"\
+})
 DRY_RUN="${DRY_RUN:-0}"                 # 1 = do not modify repo, just print
 STRATEGY_OPTS="${STRATEGY_OPTS:-}"      # e.g. "-X theirs" or "-X ours"
 
@@ -51,7 +60,7 @@ list_unique_commits() {
   # Commits in $2 that are NOT patch-identical to anything reachable from $1
   # Oldest first (rebase/cherry-pick friendly)
   local base="$1"; local branch="$2"
-  git rev-list --reverse --no-merges --cherry-pick "${base}...${branch}"
+  git rev-list --reverse --no-merges --cherry-pick "${base}..${branch}"
 }
 
 pick_commit() {
@@ -170,13 +179,14 @@ checkout_bundle_on_trunk
 # 1) Apply commits from fork/main (your maintained downstream line)
 apply_from_branch "$FORK_MAIN"
 
-# 2) Apply commits from all matching local branches (feature/*, fix/*)
-for pat in "${PATTERNS[@]}"; do
-  while read -r ref _; do
-    br="${ref#refs/heads/}"
-    [ "$br" = "$FORK_MAIN" ] && continue
-    apply_from_branch "$br"
-  done < <(git for-each-ref --format='%(refname) %(committerdate:iso8601)' "refs/heads/${pat}" | sort -k2)
+# 2) Apply commits from curated list of branches (aligned with upstream PRs)
+for br in "${BUNDLE_BRANCHES[@]}"; do
+  [ "$br" = "$FORK_MAIN" ] && continue
+  if ! branch_exists_local "$br"; then
+    note "Skip '$br' (branch not found locally)."
+    continue
+  fi
+  apply_from_branch "$br"
 done
 
 echo
