@@ -132,7 +132,7 @@ describe('SplitwiseCsvFormat', () => {
 
   it('converts Bob→Charlie payment into a reimbursement', () => {
     const expense = result.expenses.find(
-      (e) => e.title === 'Payment Bob→Charlie',
+      (e) => e.title === 'Bob pays Charlie',
     )
     expect(expense).toBeDefined()
     expect(expense!.isReimbursement).toBe(true)
@@ -144,8 +144,8 @@ describe('SplitwiseCsvFormat', () => {
   })
 
   it('converts Alice→Bob+Charlie payment into two reimbursements', () => {
-    const expenses = result.expenses.filter(
-      (e) => e.title === 'Payment Alice→Bob+Charlie',
+    const expenses = result.expenses.filter((e) =>
+      e.title.startsWith('Alice pays '),
     )
     expect(expenses).toHaveLength(2)
 

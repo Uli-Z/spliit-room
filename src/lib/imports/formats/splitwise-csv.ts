@@ -1,3 +1,6 @@
+import fs from 'fs'
+import path from 'path'
+
 import { splitCsvLine } from '@/lib/csv-utils'
 import { mapSplitwiseCategoryLabel } from '@/lib/splitwise-category-mapping'
 import {
@@ -45,6 +48,61 @@ type ReimbursementModel = {
   payer: string
   receiver: string
   amountC: number
+}
+
+type SplitwiseImportMessages = {
+  SplitwiseImport?: {
+    reimbursementTitle?: string
+  }
+}
+
+const reimbursementTemplateCache: Partial<
+  Record<SplitwiseExportLanguage, string>
+> = {}
+
+const loadReimbursementTemplate = (
+  language: SplitwiseExportLanguage,
+): string => {
+  if (reimbursementTemplateCache[language]) {
+    return reimbursementTemplateCache[language]!
+  }
+
+  const locale =
+    language === 'de' ? 'de-DE' : language === 'en' ? 'en-US' : 'en-US'
+  const filePath = path.join(process.cwd(), 'messages', `${locale}.json`)
+
+  let template: string | undefined
+  try {
+    if (fs.existsSync(filePath)) {
+      const raw = fs.readFileSync(filePath, 'utf8')
+      const parsed = JSON.parse(raw) as SplitwiseImportMessages
+      template = parsed.SplitwiseImport?.reimbursementTitle
+    }
+  } catch {
+    // ignore and fall back below
+  }
+
+  if (!template) {
+    template =
+      language === 'de'
+        ? '{payer} zahlt {receiver}'
+        : '{payer} pays {receiver}'
+  }
+
+  reimbursementTemplateCache[language] = template
+  return template
+}
+
+const formatReimbursementTitle = (
+  payerName: string,
+  receiverName: string,
+  language: SplitwiseExportLanguage,
+): string => {
+  const template = loadReimbursementTemplate(language)
+
+  return template
+    .replace('{payer}', payerName)
+    .replace('{receiver}', receiverName)
 }
 
 // Interpret deltas purely as reimbursements (no group expense).
@@ -418,6 +476,10 @@ class SplitwiseCsvFormat implements ImportFormat {
       participants = [{ id: 'Participant 1', name: 'Participant 1' }]
     }
     const participantIds = participants.map((p) => p.id)
+    const participantNameById: Record<string, string> = {}
+    for (const p of participants) {
+      participantNameById[p.id] = p.name
+    }
 
     const errors: { row: number; message: string }[] = [
       ...parsed.errors,
@@ -500,9 +562,16 @@ class SplitwiseCsvFormat implements ImportFormat {
 
       // Reimbursements -> isReimbursement:true with BY_AMOUNT split.
       for (const r of parsedRow.reimbursements) {
+        const payerName = participantNameById[r.payer] ?? r.payer
+        const receiverName = participantNameById[r.receiver] ?? r.receiver
+        const reimbursementTitle = formatReimbursementTitle(
+          payerName,
+          receiverName,
+          parsed.language,
+        )
         expenses.push({
           expenseDate,
-          title: r.description,
+          title: reimbursementTitle,
           category: mappedCategory?.id ?? 0,
           amount: r.amountC,
           originalAmount: undefined,
