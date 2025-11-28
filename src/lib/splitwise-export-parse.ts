@@ -49,6 +49,11 @@ const isSummaryRow = (description: string) => {
   return summaryIndicators.some((indicator) => normalized.includes(indicator))
 }
 
+const MAX_NAME_LENGTH = 255
+const MAX_DESCRIPTION_LENGTH = 1024
+
+const sanitize = (value: string) => value.replace(/[<>]/g, '')
+
 export function parseSplitwiseExportCsv(
   csv: string,
 ): SplitwiseExportParseResult {
@@ -132,7 +137,9 @@ export function parseSplitwiseExportCsv(
   )
   const participantNames = headerCells
     .slice(participantStartIndex)
-    .map((name) => name.trim())
+    .map((name) =>
+      sanitize(name.trim()).substring(0, MAX_NAME_LENGTH),
+    )
 
   const rows: SplitwiseExportRow[] = []
   const errors: { row: number; message: string }[] = []
@@ -142,7 +149,9 @@ export function parseSplitwiseExportCsv(
     if (cells.length === 0 || cells.every((c) => c.trim() === '')) continue
 
     const date = (cells[fieldIndices.date] ?? '').trim()
-    const description = (cells[fieldIndices.description] ?? '').trim()
+    const description = sanitize(
+      (cells[fieldIndices.description] ?? '').trim(),
+    ).substring(0, MAX_DESCRIPTION_LENGTH)
     const category = (cells[fieldIndices.category] ?? '').trim()
     const amount = toNumber(cells[fieldIndices.cost] ?? '')
     const currency = (cells[fieldIndices.currency] ?? '').trim()
@@ -191,3 +200,4 @@ export function parseSplitwiseExportCsv(
     errors,
   }
 }
+
