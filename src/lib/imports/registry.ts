@@ -6,6 +6,7 @@ import {
 // Self-registering formats (side effect imports)
 import '@/lib/imports/formats/debug-format'
 import '@/lib/imports/spliit-json'
+import '@/lib/imports/formats/splitwise-csv'
 
 // Registry entry points
 //
