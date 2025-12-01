@@ -1,9 +1,9 @@
 'use client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useTranslations } from 'next-intl'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { FormEvent, useState } from 'react'
-import { useTranslations } from 'next-intl'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -26,8 +26,10 @@ export default function LoginPage() {
       router.push(callback)
       router.refresh()
     } else if (res.status === 429) {
-      interface LoginErrorResponse { message?: string }
-      const data = await res.json() as LoginErrorResponse
+      interface LoginErrorResponse {
+        message?: string
+      }
+      const data = (await res.json()) as LoginErrorResponse
       setError(data.message || t('tooManyAttempts'))
     } else {
       setError(t('wrongPassword'))
@@ -37,10 +39,19 @@ export default function LoginPage() {
   return (
     <main className="min-h-screen flex items-center justify-center p-4">
       <form onSubmit={handleSubmit} className="space-y-4 max-w-sm w-full">
-        <p className="text-center text-sm text-muted-foreground">{t('description')}</p>
-        <Input type="password" name="password" placeholder={t('password')} required />
+        <p className="text-center text-sm text-muted-foreground">
+          {t('description')}
+        </p>
+        <Input
+          type="password"
+          name="password"
+          placeholder={t('password')}
+          required
+        />
         {error && <p className="text-destructive text-sm">{error}</p>}
-        <Button type="submit" className="w-full">{t('enter')}</Button>
+        <Button type="submit" className="w-full">
+          {t('enter')}
+        </Button>
       </form>
     </main>
   )

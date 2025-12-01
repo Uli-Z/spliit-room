@@ -2,8 +2,8 @@ import * as React from 'react'
 
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
-import { useTranslations } from 'next-intl'
 import { Search, XCircle } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -30,7 +30,7 @@ const SearchBar = React.forwardRef<HTMLInputElement, InputProps>(
             className,
           )}
           ref={ref}
-          placeholder={t("searchPlaceholder")}
+          placeholder={t('searchPlaceholder')}
           value={value}
           onChange={(e) => setValue(e.target.value)}
           {...props}

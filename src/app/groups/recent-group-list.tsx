@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { getGroups } from '@/lib/api'
+import { RuntimeFeatureFlags } from '@/lib/featureFlags'
 import { trpc } from '@/trpc/client'
 import { AppRouterOutput } from '@/trpc/routers/_app'
 import { ChevronDown, Loader2 } from 'lucide-react'
@@ -23,7 +24,6 @@ import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { PropsWithChildren, useEffect, useState } from 'react'
-import { RuntimeFeatureFlags } from '@/lib/featureFlags'
 import { RecentGroupListCard } from './recent-group-list-card'
 
 export type RecentGroupsState =
@@ -261,7 +261,10 @@ function GroupsPage({
   children,
   reload,
   runtimeFeatureFlags,
-}: PropsWithChildren<{ reload: () => void; runtimeFeatureFlags: RuntimeFeatureFlags }>) {
+}: PropsWithChildren<{
+  reload: () => void
+  runtimeFeatureFlags: RuntimeFeatureFlags
+}>) {
   const t = useTranslations('Groups')
   const router = useRouter()
   const [importOpen, setImportOpen] = useState(false)

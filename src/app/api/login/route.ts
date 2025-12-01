@@ -1,6 +1,6 @@
 import { env } from '@/lib/env'
-import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { NextResponse } from 'next/server'
 
 const MAX_ATTEMPTS = 5
 const LOCKOUT_TIME_MS = 5 * 60 * 1000 // 5 minutes
@@ -13,7 +13,13 @@ export async function POST(request: Request) {
   })
 
   if (loginAttempt && loginAttempt.lockoutUntil.getTime() > Date.now()) {
-    return NextResponse.json({ success: false, message: 'Too many login attempts. Please try again later.' }, { status: 429 })
+    return NextResponse.json(
+      {
+        success: false,
+        message: 'Too many login attempts. Please try again later.',
+      },
+      { status: 429 },
+    )
   }
 
   if (!env.SHARED_PASSWORD) {
@@ -44,7 +50,10 @@ export async function POST(request: Request) {
   } else {
     // Incorrect password, increment failed attempts
     const newAttemptCount = (loginAttempt ? loginAttempt.count : 0) + 1
-    const newLockoutUntil = newAttemptCount >= MAX_ATTEMPTS ? new Date(Date.now() + LOCKOUT_TIME_MS) : new Date(0) // Date(0) for no lockout
+    const newLockoutUntil =
+      newAttemptCount >= MAX_ATTEMPTS
+        ? new Date(Date.now() + LOCKOUT_TIME_MS)
+        : new Date(0) // Date(0) for no lockout
 
     if (loginAttempt) {
       await prisma.loginAttempt.update({
@@ -67,7 +76,13 @@ export async function POST(request: Request) {
     }
 
     if (newLockoutUntil.getTime() > 0) {
-      return NextResponse.json({ success: false, message: 'Too many login attempts. Please try again later.' }, { status: 429 })
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Too many login attempts. Please try again later.',
+        },
+        { status: 429 },
+      )
     }
     return NextResponse.json({ success: false }, { status: 401 })
   }

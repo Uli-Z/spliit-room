@@ -131,82 +131,82 @@ function Content({ children }: { children: React.ReactNode }) {
 
       <div className="pt-16 flex-1 flex flex-col">{children}</div>
 
-     <footer className="sm:p-8 md:p-16 sm:mt-16 sm:text-sm md:text-base md:mt-32 bg-slate-50 dark:bg-card border-t p-6 mt-8 flex flex-col sm:flex-row sm:justify-between gap-4 text-xs [&_a]:underline">
-      <div className="flex flex-col space-y-2">
-        {/* Hier geändert: keine weiß-Farbe mehr, nur Unterstreichung und Standard-Textfarbe */}
-        <div className="flex flex-col space-y-2 [&_a]:underline [&_a]:text-current">
-          <span>{t('Footer.madeIn')}</span>
+      <footer className="sm:p-8 md:p-16 sm:mt-16 sm:text-sm md:text-base md:mt-32 bg-slate-50 dark:bg-card border-t p-6 mt-8 flex flex-col sm:flex-row sm:justify-between gap-4 text-xs [&_a]:underline">
+        <div className="flex flex-col space-y-2">
+          {/* Hier geändert: keine weiß-Farbe mehr, nur Unterstreichung und Standard-Textfarbe */}
+          <div className="flex flex-col space-y-2 [&_a]:underline [&_a]:text-current">
+            <span>{t('Footer.madeIn')}</span>
 
-          <span>
-            {t.rich('Footer.builtBy', {
-              author: (txt) => (
-                <a href="https://scastiel.dev" target="_blank" rel="noopener">
-                  {txt}
-                </a>
-              ),
-              source: (txt) => (
-                <a
-                  href="https://github.com/Uli-Z/spliit-room/graphs/contributors"
-                  target="_blank"
-                  rel="noopener"
-                  className="inline-flex items-center space-x-1"
-                >
-                  <Image
-                    src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
-                    alt="GitHub logo"
-                    width={16}
-                    height={16}
-                  />
-                  <span>{txt}</span>
-                </a>
-              ),
-            })}
-          </span>
+            <span>
+              {t.rich('Footer.builtBy', {
+                author: (txt) => (
+                  <a href="https://scastiel.dev" target="_blank" rel="noopener">
+                    {txt}
+                  </a>
+                ),
+                source: (txt) => (
+                  <a
+                    href="https://github.com/Uli-Z/spliit-room/graphs/contributors"
+                    target="_blank"
+                    rel="noopener"
+                    className="inline-flex items-center space-x-1"
+                  >
+                    <Image
+                      src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                      alt="GitHub logo"
+                      width={16}
+                      height={16}
+                    />
+                    <span>{txt}</span>
+                  </a>
+                ),
+              })}
+            </span>
 
-          <span>
-            {t.rich('Footer.forkNotice', {
-              upstream: (txt) => (
-                <a href="https://spliit.app" target="_blank" rel="noopener">
-                  {txt}
-                </a>
-              ),
-            })}
-          </span>
+            <span>
+              {t.rich('Footer.forkNotice', {
+                upstream: (txt) => (
+                  <a href="https://spliit.app" target="_blank" rel="noopener">
+                    {txt}
+                  </a>
+                ),
+              })}
+            </span>
 
-          <span className="flex items-center space-x-4">
-            <a
-              href="https://github.com/spliit-app/spliit"
-              target="_blank"
-              rel="noopener"
-              className="inline-flex items-center space-x-1"
-            >
-              <Image
-                src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
-                alt="GitHub logo"
-                width={16}
-                height={16}
-              />
-              <span>{t('Footer.originalRepo')}</span>
-            </a>
+            <span className="flex items-center space-x-4">
+              <a
+                href="https://github.com/spliit-app/spliit"
+                target="_blank"
+                rel="noopener"
+                className="inline-flex items-center space-x-1"
+              >
+                <Image
+                  src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                  alt="GitHub logo"
+                  width={16}
+                  height={16}
+                />
+                <span>{t('Footer.originalRepo')}</span>
+              </a>
 
-            <a
-              href="https://github.com/Uli-Z/spliit-room"
-              target="_blank"
-              rel="noopener"
-              className="inline-flex items-center space-x-1"
-            >
-              <Image
-                src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
-                alt="GitHub logo"
-                width={16}
-                height={16}
-              />
-              <span>{t('Footer.forkRepo')}</span>
-            </a>
-          </span>
+              <a
+                href="https://github.com/Uli-Z/spliit-room"
+                target="_blank"
+                rel="noopener"
+                className="inline-flex items-center space-x-1"
+              >
+                <Image
+                  src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                  alt="GitHub logo"
+                  width={16}
+                  height={16}
+                />
+                <span>{t('Footer.forkRepo')}</span>
+              </a>
+            </span>
+          </div>
         </div>
-      </div>
-    </footer>
+      </footer>
       <Toaster />
     </TRPCProvider>
   )
