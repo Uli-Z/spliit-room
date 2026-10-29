@@ -1,4 +1,5 @@
 /** @jest-environment node */
+import { getBalances } from '@/lib/balances'
 import { prisma } from '@/lib/prisma'
 import { GET } from './route'
 
@@ -51,6 +52,8 @@ async function exportGroup(overrides: Record<string, unknown> = {}) {
   const headers = parse(rows[0])
   return {
     response,
+    headers,
+    cells: rows.slice(1).map(parse),
     rows: rows
       .slice(1)
       .map((r) => Object.fromEntries(parse(r).map((v, i) => [headers[i], v]))),
@@ -72,10 +75,8 @@ test('exports deterministic, balanced saldos in expense date order', async () =>
     Cost: '1.01',
     'Is Reimbursement': 'No',
   })
-  expect(Number(rows[0].Alice)).toBeGreaterThan(0)
-  expect(Number(rows[0].Bob)).toBeLessThan(0)
-  expect(Number(rows[0].Alice) + Number(rows[0].Bob)).toBe(0)
-  expect([0.5, 0.51]).toContain(Number(rows[0].Alice))
+  // expense-1 rotates the extra cent to Bob, not the first participant.
+  expect(rows[0]).toMatchObject({ Alice: '0.51', Bob: '-0.51' })
 })
 
 test.each([
@@ -152,4 +153,82 @@ test('escapes spreadsheet formulas and keeps participant names separate from fix
     amount: '0.5',
     "'=Bob": '-0.5',
   })
+})
+
+test('CSV participant totals match group balances across several expenses', async () => {
+  const expenses = [
+    { ...expense, id: 'expense-1', amount: 101 },
+    { ...expense, id: 'expense-2', amount: 101 },
+    {
+      ...expense,
+      id: 'expense-3',
+      amount: 37,
+      paidById: 'b',
+      paidFor: [{ participantId: 'a', shares: 1 }],
+      isReimbursement: true,
+    },
+    { ...expense, id: 'expense-4', amount: -103 },
+  ]
+  const { rows } = await exportGroup({ expenses })
+  const balances = getBalances(
+    expenses.map((e) => ({
+      ...e,
+      paidBy: { id: e.paidById },
+      paidFor: e.paidFor.map((p) => ({
+        participant: { id: p.participantId },
+        shares: p.shares,
+      })),
+    })) as never,
+  )
+  expect(rows[0]).toMatchObject({ Alice: '0.51', Bob: '-0.51' })
+  expect(rows[1]).toMatchObject({ Alice: '0.5', Bob: '-0.5' })
+  for (const [name, id] of [
+    ['Alice', 'a'],
+    ['Bob', 'b'],
+  ]) {
+    const exportedMinorUnits = rows.reduce(
+      (sum, row) => sum + Math.round(Number(row[name]) * 100),
+      0,
+    )
+    expect(exportedMinorUnits).toBe(balances[id].total)
+  }
+})
+
+test.each([
+  ['JPY', '¥', 101, '101', '51', '-51'],
+  ['KWD', 'KD', 101, '0.101', '0.051', '-0.051'],
+])(
+  'exports %s amounts using the group currency minor units',
+  async (currencyCode, currency, amount, cost, alice, bob) => {
+    const { rows } = await exportGroup({
+      currencyCode,
+      currency,
+      expenses: [{ ...expense, amount }],
+    })
+    expect(rows[0]).toMatchObject({ Cost: cost, Alice: alice, Bob: bob })
+  },
+)
+
+test('retains separate columns for duplicate and fixed-column participant names', async () => {
+  const { headers, cells } = await exportGroup({
+    participants: [
+      { id: 'a', name: 'Cost' },
+      { id: 'b', name: 'Same' },
+      { id: 'c', name: 'Same' },
+    ],
+    expenses: [
+      {
+        ...expense,
+        amount: 300,
+        paidFor: [
+          { participantId: 'b', shares: 1 },
+          { participantId: 'c', shares: 1 },
+        ],
+      },
+    ],
+  })
+  expect(headers.slice(-3)).toEqual(['Cost', 'Same', 'Same'])
+  expect(cells[0][headers.indexOf('Cost')]).toBe('3.00')
+  expect(cells[0].slice(-3)).toEqual(['3', '-1.5', '-1.5'])
+  expect(cells[0][headers.indexOf('Paid By')]).toBe('Cost')
 })
