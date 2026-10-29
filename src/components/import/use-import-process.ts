@@ -9,7 +9,7 @@ import {
 import { ExpenseFormValues } from '@/lib/schemas'
 import { trpc } from '@/trpc/client'
 import { useTranslations } from 'next-intl'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 // Minimal shape of the result state used by the UI.
 type ImportResultState = null | {
@@ -50,6 +50,15 @@ export function useFileImportProcess(options?: {
     null,
   )
   const [previewError, setPreviewError] = useState<string | null>(null)
+
+  // Only the latest analysis may update the preview, including after a reset.
+  const analysisGenerationRef = useRef(0)
+  useEffect(
+    () => () => {
+      analysisGenerationRef.current += 1
+    },
+    [],
+  )
 
   // Ref to stop the loop
   const cancelRequestedRef = useRef(false)
@@ -96,6 +105,8 @@ export function useFileImportProcess(options?: {
         return
       }
 
+      const generation = ++analysisGenerationRef.current
+
       setFileName(file.name)
       setProcessState('analyzing')
       setPreviewResult(null)
@@ -109,6 +120,8 @@ export function useFileImportProcess(options?: {
           reader.readAsText(file, 'utf-8')
         })
 
+        if (generation !== analysisGenerationRef.current) return
+
         if (!content.trim()) {
           setPreviewResult(null)
           setPreviewError(null)
@@ -118,12 +131,16 @@ export function useFileImportProcess(options?: {
 
         setFileContent(content)
         const result = await buildExpensesFromFileImport(content)
+        if (generation !== analysisGenerationRef.current) return
+
         setPreviewResult(result)
         setProcessState('preview')
         if (result.group?.name) {
           setGroupName(result.group.name)
         }
       } catch (error) {
+        if (generation !== analysisGenerationRef.current) return
+
         setPreviewResult(null)
         const msg = error instanceof Error ? error.message : 'Analysis failed'
         setPreviewError(localizeErrorMessage(msg))
@@ -280,6 +297,7 @@ export function useFileImportProcess(options?: {
   }, [])
 
   const resetProcess = useCallback(() => {
+    analysisGenerationRef.current += 1
     setProcessState('idle')
     setFileContent('')
     setFileName(null)
