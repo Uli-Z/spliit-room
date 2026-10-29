@@ -42,6 +42,10 @@ import {
   convertToGroupCurrency,
   convertToOriginalCurrency,
 } from '@/lib/currency-conversion'
+import {
+  defaultSplittingOptionsSchema,
+  hasOnlyGroupParticipants,
+} from '@/lib/default-splitting-options'
 import { RuntimeFeatureFlags } from '@/lib/featureFlags'
 import { useActiveUser, useCurrencyRate } from '@/lib/hooks'
 import { randomId } from '@/lib/random'
@@ -72,7 +76,6 @@ import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { match } from 'ts-pattern'
-import { z } from 'zod'
 import { DeletePopup } from '../../../../components/delete-popup'
 import { extractCategoryFromTitle } from '../../../../components/expense-form-actions'
 import { Textarea } from '../../../../components/ui/textarea'
@@ -119,29 +122,19 @@ const getDefaultSplittingOptions = (
       // Invalid legacy data must not prevent an expense form from opening.
     }
   }
-  const result = z
-    .object({
-      splitMode: z.enum(SplitMode),
-      paidFor: z
-        .array(z.object({ participant: z.string(), shares: z.number() }))
-        .nullable(),
-    })
-    .safeParse(rawOptions)
+  const result = defaultSplittingOptionsSchema.safeParse(rawOptions)
   if (!result.success) return defaultValue
   const options = result.data
-  if (options.paidFor === null) {
-    return { splitMode: options.splitMode, paidFor: defaultValue.paidFor }
-  }
   if (
-    !Array.isArray(options.paidFor) ||
-    options.paidFor.some(
-      ({ participant, shares }) =>
-        !group.participants.some(({ id }) => id === participant) ||
-        typeof shares !== 'number' ||
-        !Number.isFinite(shares),
+    !hasOnlyGroupParticipants(
+      options.paidFor,
+      group.participants.map(({ id }) => id),
     )
   ) {
     return defaultValue
+  }
+  if (options.paidFor === null) {
+    return { splitMode: options.splitMode, paidFor: defaultValue.paidFor }
   }
 
   return {
@@ -175,6 +168,7 @@ export function ExpenseForm({
   runtimeFeatureFlags: RuntimeFeatureFlags
 }) {
   const t = useTranslations('ExpenseForm')
+  const errors = useTranslations('Errors')
   const locale = useLocale() as Locale
   const isCreate = expense === undefined
   const searchParams = useSearchParams()
@@ -328,11 +322,18 @@ export function ExpenseForm({
         paidFor: computePaidFor(),
       } satisfies SplittingOptions
 
-      await updateDefaultSplittingOptions({
-        groupId: group.id,
-        defaultSplittingOptions: splittingOptions,
-      })
-      await utils.groups.invalidate()
+      try {
+        await updateDefaultSplittingOptions({
+          groupId: group.id,
+          defaultSplittingOptions: splittingOptions,
+        })
+        await utils.groups.invalidate()
+      } catch {
+        form.setError('root.defaultSplittingOptions', {
+          message: errors('generic'),
+        })
+        return
+      }
     }
     // Store monetary amounts in minor units (cents)
     values.amount = amountAsMinorUnits(values.amount, groupCurrency)
@@ -639,6 +640,11 @@ export function ExpenseForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(submit)}>
+        {form.formState.errors.root?.defaultSplittingOptions?.message && (
+          <p role="alert" className="text-destructive">
+            {form.formState.errors.root.defaultSplittingOptions.message}
+          </p>
+        )}
         <Card>
           <CardHeader>
             <CardTitle>

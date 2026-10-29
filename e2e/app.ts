@@ -197,6 +197,13 @@ export async function addExpense(
   }
 
   if (expense.saveDefault) {
+    if (
+      !(await page.getByText('Save as default splitting options').isVisible())
+    ) {
+      await page
+        .getByRole('button', { name: /Advanced splitting options/ })
+        .click()
+    }
     await page.getByText('Save as default splitting options').click()
   }
   await submit.click()
