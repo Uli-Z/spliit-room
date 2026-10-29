@@ -29,6 +29,9 @@ export function ImportAnalysisPanel({
   const rowErrors = previewResult?.errors ?? []
   const categoryWarnings: { row: number; label: string; message: string }[] = []
   const participantSummaries = previewResult?.participantSummaries ?? []
+  // JSON export IDs seed rounding, but the import creates new IDs. The
+  // computed preview would otherwise imply balances that cannot be guaranteed.
+  const isSpliitJson = previewResult?.format.id === 'spliit-json'
 
   let currency: CurrencyType | null = null
   const currencyCode = previewResult?.group?.currencyCode
@@ -73,6 +76,7 @@ export function ImportAnalysisPanel({
     </span>
   ))
 
+  const participantNames = previewResult?.participants ?? []
   const totalAmount =
     previewResult?.expenses.reduce((sum, e) => sum + e.amount, 0) ?? 0
   const formattedTotalAmount =
@@ -121,9 +125,17 @@ export function ImportAnalysisPanel({
             </div>
             <div>
               <p className="text-sm font-medium">
-                {t('generalInfoParticipants')}
+                {t(
+                  isSpliitJson
+                    ? 'generalInfoParticipantNames'
+                    : 'generalInfoParticipants',
+                )}
               </p>
-              {participantSummaries.length > 0 ? (
+              {isSpliitJson && participantNames.length > 0 ? (
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {participantNames.join(', ')}
+                </p>
+              ) : !isSpliitJson && participantSummaries.length > 0 ? (
                 <p className="mt-2 space-x-1 text-sm text-muted-foreground">
                   {participantList}
                 </p>

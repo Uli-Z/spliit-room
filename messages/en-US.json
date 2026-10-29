@@ -616,6 +616,7 @@
     "generalInfoRows": "Rows",
     "generalInfoInvalidRows": "Invalid rows",
     "generalInfoTotal": "Total amount",
+    "generalInfoParticipantNames": "Participants",
     "generalInfoParticipants": "Participants and balances",
     "generalInfoParticipantsEmpty": "No participant information detected.",
     "generalInfoUnknown": "Unknown",

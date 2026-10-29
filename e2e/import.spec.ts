@@ -35,6 +35,14 @@ test('imports a Spliit JSON file into a new group', async ({ page }) => {
   })
   await expect(page.getByText('Spliit JSON', { exact: true })).toBeVisible()
   const dialog = page.getByRole('dialog')
+  const participants = dialog
+    .getByText('Participants', { exact: true })
+    .locator('..')
+  await expect(participants).toContainText('Alice, Bob')
+  await expect(participants).not.toContainText('$')
+  await expect(
+    dialog.getByText('Participants and balances', { exact: true }),
+  ).toHaveCount(0)
   await dialog.locator('.overflow-y-scroll').evaluate((el) => {
     el.scrollTop = el.scrollHeight
   })

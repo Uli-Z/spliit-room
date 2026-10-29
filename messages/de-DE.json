@@ -620,6 +620,7 @@
     "generalInfoRows": "Zeilen",
     "generalInfoInvalidRows": "Ungültige Zeilen",
     "generalInfoTotal": "Gesamtbetrag",
+    "generalInfoParticipantNames": "Teilnehmende",
     "generalInfoParticipants": "Teilnehmer und Salden",
     "generalInfoParticipantsEmpty": "Keine Teilnehmerinformationen erkannt.",
     "generalInfoUnknown": "Unbekannt",
