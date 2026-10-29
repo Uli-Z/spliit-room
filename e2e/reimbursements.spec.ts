@@ -24,6 +24,14 @@ test('settles a debt through "Mark as paid"', async ({ page }) => {
     paidBy: 'Alice',
   })
 
+  // A previously saved unequal default must not affect a suggested repayment.
+  await page.evaluate((id) => {
+    localStorage.setItem(
+      `${id}-defaultSplittingOptions`,
+      JSON.stringify({ splitMode: 'BY_AMOUNT', paidFor: null }),
+    )
+  }, groupId)
+
   await openTab(page, 'Balances')
   await expectBalance(page, 'Alice', 50)
   await expectBalance(page, 'Bob', -50)
@@ -41,6 +49,8 @@ test('settles a debt through "Mark as paid"', async ({ page }) => {
   await expect(page.locator('input[name="title"]')).toHaveValue('Reimbursement')
   await expect(page.locator('input[name="amount"]')).toHaveValue(/^50/)
   await expect(page.getByTestId('paid-by')).toContainText('Bob')
+  await page.getByRole('button', { name: /Advanced splitting options/ }).click()
+  await expect(page.getByTestId('split-mode')).toHaveText('Evenly')
   await expect(paidForRow(page, 'Alice').getByRole('checkbox')).toHaveAttribute(
     'aria-checked',
     'true',
