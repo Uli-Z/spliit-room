@@ -72,6 +72,7 @@ import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { match } from 'ts-pattern'
+import { z } from 'zod'
 import { DeletePopup } from '../../../../components/delete-popup'
 import { extractCategoryFromTitle } from '../../../../components/expense-form-actions'
 import { Textarea } from '../../../../components/ui/textarea'
@@ -109,18 +110,25 @@ const getDefaultSplittingOptions = (
 
   // Keep an existing browser-local default until the group has a server default.
   // We do not automatically publish it: members may have different local defaults.
-  let options = group.defaultSplittingOptions as SplittingOptions | null
-  if (!options && typeof localStorage !== 'undefined') {
+  let rawOptions: unknown = group.defaultSplittingOptions
+  if (rawOptions === null && typeof localStorage !== 'undefined') {
     try {
       const saved = localStorage.getItem(`${group.id}-defaultSplittingOptions`)
-      if (saved) options = JSON.parse(saved) as SplittingOptions
+      if (saved) rawOptions = JSON.parse(saved)
     } catch {
       // Invalid legacy data must not prevent an expense form from opening.
     }
   }
-  if (!options || !Object.values(SplitMode).includes(options.splitMode)) {
-    return defaultValue
-  }
+  const result = z
+    .object({
+      splitMode: z.enum(SplitMode),
+      paidFor: z
+        .array(z.object({ participant: z.string(), shares: z.number() }))
+        .nullable(),
+    })
+    .safeParse(rawOptions)
+  if (!result.success) return defaultValue
+  const options = result.data
   if (options.paidFor === null) {
     return { splitMode: options.splitMode, paidFor: defaultValue.paidFor }
   }
@@ -295,7 +303,10 @@ export function ExpenseForm({
 
   const sendEvent = useAnalytics()
   const submit = async (values: ExpenseFormValues) => {
-    sendEvent({ event: expense ? 'expense: update' : 'expense: create', props: {} }, `/groups/${group.id}/expenses`)
+    sendEvent(
+      { event: expense ? 'expense: update' : 'expense: create', props: {} },
+      `/groups/${group.id}/expenses`,
+    )
     if (values.saveDefaultSplittingOptions) {
       const computePaidFor = (): SplittingOptions['paidFor'] => {
         if (values.splitMode === 'EVENLY') {

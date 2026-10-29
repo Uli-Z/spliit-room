@@ -1,6 +1,6 @@
+import { SplitMode } from '@/generated/prisma/client'
 import { prisma } from '@/lib/prisma'
 import { baseProcedure } from '@/trpc/init'
-import { SplitMode } from '@/generated/prisma/client'
 import { z } from 'zod'
 
 export const updateDefaultSplittingOptionsProcedure = baseProcedure
