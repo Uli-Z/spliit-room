@@ -637,6 +637,7 @@
     "importResultCompleted": "{created} von {total} Zeilen importiert",
     "importResultCancelledSimple": "Import abgebrochen. Die teilweise importierte Gruppe bleibt in deiner Gruppenübersicht erhalten.",
     "importResultConfirm": "Weiter",
+    "recurrenceWarning": "Wiederkehrende Ausgaben werden als einzelne Ausgaben ohne Wiederholung importiert. Der Export kennzeichnet aktive Serien nicht. Aktiviere die Wiederholung bei Bedarf manuell bei der neuesten Ausgabe.",
     "roundingWarning": "Einzelne Salden können nach dem Import um kleinste Währungseinheiten abweichen. Prüfe die Salden vor der Nutzung.",
     "historyWarning": "Der Aktivitätsverlauf wird nicht importiert; Spliit-JSON-Exporte enthalten keine Dokumentanhänge."
   },

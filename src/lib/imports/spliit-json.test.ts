@@ -35,6 +35,35 @@ describe('SpliitJsonFormat', () => {
   })
 
   describe('parseToInternal', () => {
+    it('imports historical, active and stopped recurrence occurrences without scheduling duplicates', async () => {
+      const result = await format.parseToInternal(
+        JSON.stringify({
+          participants: [{ id: 'a', name: 'Alice' }],
+          expenses: ['2025-01-01', '2025-02-01', '2025-03-01'].map(
+            (expenseDate, index) => ({
+              id: `occurrence-${index}`,
+              title: 'Rent',
+              expenseDate,
+              amount: 10000,
+              paidById: 'a',
+              paidFor: [{ participantId: 'a', shares: 1 }],
+              recurrenceRule: index === 2 ? 'NONE' : 'MONTHLY',
+            }),
+          ),
+        }),
+      )
+      expect(result.errors).toEqual([])
+      expect(result.expenses).toHaveLength(3)
+      expect(result.expenses.map((expense) => expense.recurrenceRule)).toEqual([
+        'NONE',
+        'NONE',
+        'NONE',
+      ])
+      expect(result.expenses.map((expense) => expense.amount)).toEqual([
+        10000, 10000, 10000,
+      ])
+    })
+
     it('should parse a valid export correctly', async () => {
       const content = JSON.stringify({
         participants: [

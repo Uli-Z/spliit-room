@@ -633,6 +633,7 @@
     "importResultCompleted": "Imported {created} of {total} rows",
     "importResultCancelledSimple": "Import cancelled. The partially imported group remains in your groups.",
     "importResultConfirm": "Continue",
+    "recurrenceWarning": "Recurring expenses are imported as individual expenses with recurrence turned off. The export does not identify active series. Enable recurrence manually on the latest expense if needed.",
     "roundingWarning": "Rounding of individual balances can differ by minor units after import. Check balances before using the new group.",
     "historyWarning": "The activity history is not imported; Spliit JSON exports do not include document attachments."
   },

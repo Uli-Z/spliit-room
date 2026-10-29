@@ -561,6 +561,7 @@
     "importResultCompleted": "{created} de {total} filas importadas",
     "importResultCancelledSimple": "Importación cancelada. El grupo parcialmente importado permanece en tus grupos.",
     "importResultConfirm": "Continuar",
+    "recurrenceWarning": "Los gastos recurrentes se importan como gastos individuales sin repetición. La exportación no identifica las series activas. Si es necesario, activa la repetición manualmente en el gasto más reciente.",
     "roundingWarning": "Los saldos individuales pueden variar en unidades mínimas tras la importación. Comprueba los saldos.",
     "historyWarning": "No se importa el historial de actividad; los archivos JSON de Spliit no contienen documentos adjuntos."
   },

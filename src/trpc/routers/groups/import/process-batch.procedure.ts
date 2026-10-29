@@ -40,7 +40,7 @@ export const processBatchProcedure = baseProcedure
         createdIds.push(expenseId)
 
         // Note: We skip individual activity logging for performance and noise reduction.
-        // We also skip complex recurrence creation for imports as they are usually historical.
+        // Imports are historical snapshots; no recurrence links are restored.
 
         await tx.expense.create({
           data: {
@@ -55,7 +55,7 @@ export const processBatchProcedure = baseProcedure
             title: expense.title,
             paidById: expense.paidBy,
             splitMode: expense.splitMode,
-            recurrenceRule: expense.recurrenceRule || RecurrenceRule.NONE,
+            recurrenceRule: RecurrenceRule.NONE,
             isReimbursement: expense.isReimbursement,
             notes: expense.notes,
             paidFor: {

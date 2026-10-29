@@ -24,7 +24,7 @@ export function ImportAnalysisPanel({
   const headerErrors: string[] = []
   const generalWarnings: string[] =
     previewResult?.format.id === 'spliit-json'
-      ? [t('roundingWarning'), t('historyWarning')]
+      ? [t('roundingWarning'), t('historyWarning'), t('recurrenceWarning')]
       : []
   const rowErrors = previewResult?.errors ?? []
   const categoryWarnings: { row: number; label: string; message: string }[] = []

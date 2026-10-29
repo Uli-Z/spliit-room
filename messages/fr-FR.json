@@ -607,6 +607,7 @@
     "importResultCompleted": "{created} sur {total} lignes importées",
     "importResultCancelledSimple": "Importation annulée. Le groupe partiellement importé reste dans vos groupes.",
     "importResultConfirm": "Continuer",
+    "recurrenceWarning": "Les dépenses récurrentes sont importées comme des dépenses individuelles sans récurrence. L’export ne permet pas d’identifier les séries actives. Si nécessaire, activez manuellement la récurrence sur la dépense la plus récente.",
     "roundingWarning": "Les soldes individuels peuvent différer de quelques unités minimales après importation. Vérifiez les soldes.",
     "historyWarning": "L’historique des activités n’est pas importé ; les exports JSON Spliit ne contiennent pas les pièces jointes."
   },

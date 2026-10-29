@@ -291,8 +291,10 @@ export class SpliitJsonFormat implements ImportFormat {
       isReimbursement: e?.isReimbursement ?? false,
       documents: [],
       notes: e?.notes ?? undefined,
-      recurrenceRule:
-        (e?.recurrenceRule as ExpenseFormValues['recurrenceRule']) ?? 'NONE',
+      // Exports do not include recurrence links, so historical and stopped
+      // series cannot be distinguished from an active series. Import each
+      // occurrence once; users can explicitly enable future recurrence.
+      recurrenceRule: 'NONE',
     }
   }
 }

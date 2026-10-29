@@ -306,7 +306,10 @@ function GroupsPage({
       <FileImportModal
         hideTrigger
         open={importOpen}
-        onOpenChange={setImportOpen}
+        onOpenChange={(open) => {
+          setImportOpen(open)
+          if (!open) reload()
+        }}
         onCreateSuccess={({ groupId, groupName }) => {
           saveRecentGroup({ id: groupId, name: groupName })
           reload()
