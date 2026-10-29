@@ -116,9 +116,9 @@ class SplitwiseCsvFormat implements ImportFormat {
         continue
       }
 
-      // Robust date parsing using dayjs. Splitwise usually uses YYYY-MM-DD (ISO) in exports.
-      // We accept a few common variants just in case, but rely on ISO primarily.
-      const expenseDate = dayjs(row.date)
+      // Splitwise exports calendar dates in ISO format; reject invalid dates
+      // instead of allowing the parser to roll them into a different month.
+      const expenseDate = dayjs(row.date, 'YYYY-MM-DD', true)
       if (!expenseDate.isValid()) {
         errors.push({
           row: row.rowNumber,

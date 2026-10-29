@@ -273,6 +273,36 @@ describe('Splitwise balance safety', () => {
     )
   })
 
+  it('rejects balanced deltas that exceed the expense amount', async () => {
+    const parsed = await splitwiseCsvFormat.parseToInternal(
+      singleRow('1.00', 'EUR', '2.00', '-2.00'),
+    )
+    expect(parsed.expenses).toEqual([])
+    expect(parsed.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          message: 'Expense balances exceed its total amount',
+        }),
+      ]),
+    )
+  })
+
+  it('rejects impossible calendar dates instead of normalizing them', async () => {
+    const csv = singleRow('1.00', 'EUR', '0.50', '-0.50').replace(
+      '2026-01-01',
+      '2026-02-30',
+    )
+    const parsed = await splitwiseCsvFormat.parseToInternal(csv)
+    expect(parsed.expenses).toEqual([])
+    expect(parsed.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          message: 'Invalid expense date: 2026-02-30',
+        }),
+      ]),
+    )
+  })
+
   it('rejects malformed numbers, unsupported precision, and mixed currencies', async () => {
     const invalid = await splitwiseCsvFormat.parseToInternal(
       singleRow('1.00', 'EUR', 'abc', '-1.00'),

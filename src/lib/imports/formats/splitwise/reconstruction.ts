@@ -82,6 +82,14 @@ export const parseExportRow = (
     throw new Error('totalC must be positive for Splitwise rows')
   }
 
+  const totalPositiveDeltas = participants.reduce(
+    (sum, p) => sum + Math.max(0, deltasC[p] ?? 0),
+    0,
+  )
+  if (totalPositiveDeltas > totalC) {
+    throw new Error('Expense balances exceed its total amount')
+  }
+
   // Reconstruction Strategy:
   // We need to determine (Payer, Amount, Shares) tuples that explain the Deltas.
   // We assume:
