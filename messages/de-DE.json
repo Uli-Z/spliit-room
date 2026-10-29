@@ -358,6 +358,9 @@
       "markAsPaid": "Als bezahlt markieren"
     }
   },
+  "SplitwiseImport": {
+    "reimbursementTitle": "{payer} zahlt {receiver}"
+  },
   "Stats": {
     "title": "Statistiken",
     "Totals": {
